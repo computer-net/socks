@@ -1,6 +1,10 @@
 package tools
 
-import "io"
+import (
+	"io"
+	"log"
+	"net"
+)
 
 const bufSize =  1024
 
@@ -56,7 +60,7 @@ func (secureSocket *SecureTCPConn) EncodeCopy(dst io.ReadWriteCloser) error {
 }
 
 // 从 src 中持续读取加密后的数据，解密后，写入到 dst 中
-func (secureSocket *SecureTCPConn) DecodeCopy (dst io.Writer) error {
+func (secureSocket *SecureTCPConn) DecodeCopy(dst io.Writer) error {
 	buf := make([]byte, bufSize)
 	for {
 		// 读取加密后的数据
@@ -78,5 +82,42 @@ func (secureSocket *SecureTCPConn) DecodeCopy (dst io.Writer) error {
 				return io.ErrShortWrite
 			}
 		}
+	}
+}
+
+func DialEncryptedTCP(raddr *net.TCPAddr, cipher *Cipher) (*SecureTCPConn, error) {
+	remoteConn, err := net.DialTCP("tcp", nil, raddr)
+	if err != nil {
+		return nil, err
+	}
+	//	设置 Conn 被关闭时清除所有数据
+	remoteConn.SetLinger(0)
+	return &SecureTCPConn{
+		ReadWriteCloser: remoteConn,
+		Cipher: cipher,
+	}, nil
+}
+
+func ListenEncryptedTCP(laddr *net.TCPAddr, cipher *Cipher, handleConn func(localConn *SecureTCPConn), didListen func(listenAddr *net.TCPAddr)) error  {
+	listener, err := net.ListenTCP("tcp", laddr)
+	if err != nil {
+		return err
+	}
+	defer listener.Close()
+	if didListen != nil {
+		go didListen(listener.Addr().(*net.TCPAddr))
+	}
+	for {
+		localConn, err := listener.AcceptTCP()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		// localConn被关闭时直接清除所有数据 不管没有发送的数据
+		localConn.SetLinger(0)
+		go handleConn(&SecureTCPConn{
+			ReadWriteCloser: localConn,
+			Cipher:          cipher,
+		})
 	}
 }
