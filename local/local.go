@@ -43,7 +43,6 @@ func NewRsLocal(password string, listenAddr, remoteAddr string) (*RsLocal, error
 }
 
 func (local *RsLocal)handleConn(userConn *tools.SecureTCPConn) {
-	log.Println(userConn)
 	defer userConn.Close()
 	proxyServer, err := tools.DialEncryptedTCP(local.RemoteAddr, local.Cipher)
 	if err != nil {

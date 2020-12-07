@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/binary"
+	"log"
 	"net"
 	"socks-rocketeerli/tools"
 )
@@ -121,7 +122,7 @@ func (rsServer *RsServer) handleConn(localConn *tools.SecureTCPConn) {
 		IP:   dIP,
 		Port: int(binary.BigEndian.Uint16(dPort)),
 	}
-
+	log.Println(dstAddr)
 	// 连接真正的远程服务
 	dstServer, err := net.DialTCP("tcp", nil, dstAddr)
 	if err != nil {
