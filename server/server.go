@@ -34,13 +34,13 @@ func NewRsServer(password string, listenAAddr string) (*RsServer, error)  {
 }
 
 // 运行服务端并且监听来自本地代理客户端的请求
-func (lsServer *RsServer) Listen(didListen func(listenAddr *net.TCPAddr)) error {
-	return tools.ListenEncryptedTCP(lsServer.ListenAddr, lsServer.Cipher, lsServer.handleConn, didListen)
+func (rsServer *RsServer) Listen(didListen func(listenAddr *net.TCPAddr)) error {
+	return tools.ListenEncryptedTCP(rsServer.ListenAddr, rsServer.Cipher, rsServer.handleConn, didListen)
 }
 
 // 解 SOCKS5 协议
 // https://www.ietf.org/rfc/rfc1928.txt
-func (lsServer *RsServer) handleConn(localConn *tools.SecureTCPConn) {
+func (rsServer *RsServer) handleConn(localConn *tools.SecureTCPConn) {
 	defer localConn.Close()
 	buf := make([]byte, 256)
 

@@ -25,7 +25,7 @@ func init() {
 		log.Fatal(err)
 	}
 	// 默认的配置文件名称
-	configFilename := ".socks5-rocketeerli.json"
+	configFilename := "socks5-rocketeerli.json"
 	// 如果用户有传配置文件，就使用用户传入的配置文件
 	if len(os.Args) == 2 {
 		configFilename = os.Args[1]
