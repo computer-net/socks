@@ -16,6 +16,11 @@ import (
 	"golang.org/x/net/proxy"
 )
 
+
+/**
+测试代码，没啥用，仅供参考
+*/
+
 const (
 	MaxPackSize               = 1024 * 1024 * 5 // 5Mb
 	EchoServerAddr            = "127.0.0.1:3453"
