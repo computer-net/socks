@@ -1,6 +1,7 @@
 package socks5
 
 import (
+	"errors"
 	"log"
 	"net"
 	"net/url"
@@ -8,6 +9,20 @@ import (
 
 // Version is socks5 version number.
 const Version = 5
+
+// Errors are socks5 errors
+var Errors = []error{
+	errors.New(""),
+	errors.New("general failure"),
+	errors.New("connection forbidden"),
+	errors.New("network unreachable"),
+	errors.New("host unreachable"),
+	errors.New("connection refused"),
+	errors.New("TTL expired"),
+	errors.New("command not supported"),
+	errors.New("address type not supported"),
+	errors.New("socks5UDPAssociate"),
+}
 
 type Dialer interface {
 	// Addr is the dialer's addr
