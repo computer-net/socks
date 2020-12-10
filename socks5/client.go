@@ -9,14 +9,11 @@ import (
 )
 
 // NewSocks5Dialer returns a socks5 proxy dialer.
-func NewSocks5Dialer(s string, d Dialer) (Dialer, error) {
-	return NewSocks5(s, d, nil)
+func NewSocks5Dialer(s string) (*Socks5, error) {
+	return NewSocks5(s)
 }
 
 func (s *Socks5) Addr() string {
-	if s.addr == "" {
-		return s.dialer.Addr()
-	}
 	return s.addr
 }
 
@@ -26,13 +23,14 @@ func (s *Socks5) Dial(network, addr string) (net.Conn, error) {
 	default:
 		return nil, errors.New("[socks5]: no support for connection type " + network)
 	}
-	c, err := s.dialer.Dial(network, s.addr)
+	c, err := net.Dial(network, s.addr)
 	if err != nil {
 		log.Printf("[socks5]: dial to %s error: %s", s.addr, err)
 		return nil, err
 	}
 	if err := s.connect(c, addr); err != nil {
 		c.Close()
+		log.Printf("cnask %s", err)
 		return nil, err
 	}
 	return c, nil
