@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"socks-rocketeerli/socks5"
 )
 
@@ -14,16 +12,17 @@ func main() {
 	if err != nil {
 		log.Fatalln("创建 socks5 对象失败 !!!")
 	}
-	client := http.Client{
-		Transport: &http.Transport{
-			Dial: socks.Dial,
-		},
-	}
-	resp, err := client.Get("https://baidu.com")
+	conn, err := socks.Dial("tcp", "www.baidu.com:80")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close()
-	b, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(b))
+	n, err := conn.Write([]byte("GET / HTTP/1.1\r\nHost: www.baidu.com\r\n\r\n"))
+	log.Println(n, err)
+	var b [64 * 1024]byte
+	n, err = conn.Read(b[:])
+	if err != nil {
+		log.Fatal(err)
+	}
+	//TODO: 处理Content-Length
+	fmt.Println(string(b[:n]))
 }
